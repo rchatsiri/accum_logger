@@ -33,11 +33,5 @@ object ApplicaitonMain extends App {
   
   implicit val aggregateLoggerService = inject[AggregateLoggerService]
   aggregateLoggerService.receiveFlumeLogging(appName.getOrElse(""),
-    sparkNode.getOrElse(""),
-    topicName.getOrElse(""),
-    bootstrapNode.getOrElse(""),
-    groupId.getOrElse(""),
-    consumerId.getOrElse(""))
-   
-
+    sparkNode.getOrElse("")) 
 }

@@ -1,42 +1,38 @@
 package dev.infra.accumlogger
 
-
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.SparkConf
-import org.apache.spark.streaming.kafka010.KafkaUtils
-import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
-import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
-import org.apache.spark.streaming.kafka010.OffsetRange
-import org.apache.spark.streaming.kafka010.HasOffsetRanges
-import org.apache.spark.TaskContext
-import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.streaming.kafka010.ConsumerStrategies
-import org.apache.spark.streaming.kafka010.PreferConsistent
-import com.typesafe.scalalogging.LazyLogging
-import org.slf4j.Marker
-import org.apache.spark.streaming.Minutes
-import org.apache.spark.streaming.kafka010.CanCommitOffsets
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.streaming.dstream.InputDStream
-import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.spark.rdd.RDD
-import java.util.regex.Pattern
-import org.apache.spark.streaming.flume._
+import com.typesafe.scalalogging.LazyLogging 
+import org.apache.spark.streaming.dstream.DStream
+import java.net.InetAddress 
+import org.apache.spark.streaming.flume.FlumeUtils 
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTime
+import dev.infra.accumlogger.utils.DateUtils
 
 class AggregateLoggerService extends LazyLogging {
 
-  def receiveFlumeLogging(appName: String, sparkNode: String, topicName: String, bootstrapNode: String, groupId: String, consumerId: String): Unit = {
+  def getIPAddress(): String = {
+    val localhost: InetAddress = InetAddress.getLocalHost
+    val localIpAddress: String = localhost.getHostAddress
+    localIpAddress
+  }
+   
+  
+
+  // Support push base
+  def receiveFlumeLogging(appName: String, sparkNode: String): Unit = {
     val conf = new SparkConf().setMaster(sparkNode).setAppName(appName)
     val ssc = new StreamingContext(conf, Seconds(30))
-    val flumeStream = FlumeUtils.createStream(ssc, "localhost", 9988)
-
-    flumeStream.count().map(cnt => "Received " + cnt + " flume events.").print()
-
-    val lines = flumeStream.map {
-      e => new String(e.event.getBody().array(), "UTF-8")
-    }
-
+    ssc.sparkContext.setCheckpointDir("hdfs://10.10.100.11:9000/user/flume/checkpoint/jdb/")
+    val date = DateUtils.getCurrentDate();
+    val hour = DateUtils.getCurrentHour();
+    val currentPath = date+"/server-log/"+hour;
+    println("CURRENT PATH["+currentPath+"]");
+    val fileStream = ssc.textFileStream("hdfs://10.10.100.11:9000/user/flume/jdb/"+currentPath); 
+    val ret = fileStream.filter(x => x.matches("\\[\\w*].\\d{17}.\\w[system|transaction|access]*.\\w[DEBUG|INFO]"))
+    ret.print()
     ssc.start()
     ssc.awaitTermination();
   }
@@ -44,6 +40,27 @@ class AggregateLoggerService extends LazyLogging {
 }
 
 
+ /* Flume direct stream 
+    val flumeStream = FlumeUtils.createStream(ssc, "localhost", 9988)
 
+    
+    val data : DStream[String] = flumeStream.map(x => new String(x.event.getBody.array()))
+    data.filter(_.matches("") == "system ERROR")
+    data.print();
+    
+     
+      
+    flumeStream.count().map(cnt => "Received ["+cnt+"] flume events").print()
+    */
+
+/*
+    val fs: DStream[String] = flumeStream.count().map(cnt => "Flume-Received-Stream [" + cnt + "], flume events")
+    fs.print();
+
+
+    val lines = flumeStream.map {
+      e => new String(e.event.getBody().array(), "UTF-8")
+    }
+*/
 
 

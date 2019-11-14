@@ -1,0 +1,132 @@
+docker-kafka
+
+sudo docker run \
+-p 9092:9092 \
+-v /home/vagrant/workspaceml/kafka-zookeeper/bitnami-data/kafka_data:/bitnami \
+-v /home/vagrant/workspaceml/kafka-zookeeper/bitnami-data/kafka_config:/opt/bitnami/kafka/conf \
+-v /home/vagrant/workspaceml/kafka-zookeeper/bitnami-data/kafka_log:/opt/bitnami/kafka/logs \
+--name kafka-broker-01 \
+-e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
+-e ALLOW_PLAINTEXT_LISTENER=yes \
+-d bitnami/kafka:2
+ 
+-- Success.
+01
+sudo docker run \
+--net=processing-nw \
+-p 9092:9092 \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-01/kafka_data:/bitnami \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-01/kafka_config:/opt/bitnami/kafka/conf \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-01/kafka_log:/opt/bitnami/kafka/logs \
+--name kafka-broker-01 \
+-e KAFKA_ZOOKEEPER_CONNECT=172.18.0.2:2181 \
+-e ALLOW_PLAINTEXT_LISTENER=yes \
+-d bitnami/kafka:2
+
+02
+sudo docker run \
+--net=processing-nw \
+-p 9093:9093 \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-02/kafka_data:/bitnami \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-02/kafka_config:/opt/bitnami/kafka/conf \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-02/kafka_log:/opt/bitnami/kafka/logs \
+--name kafka-broker-02 \
+-e KAFKA_ZOOKEEPER_CONNECT=172.18.0.2:2181 \
+-e ALLOW_PLAINTEXT_LISTENER=yes \
+-d bitnami/kafka:2
+
+03
+sudo docker run \
+--net=processing-nw \
+-p 9094:9094 \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-03/kafka_data:/bitnami \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-03/kafka_config:/opt/bitnami/kafka/conf \
+-v /home/vagrant/workspaceml/kafka-zookeeper/kafka-03/kafka_log:/opt/bitnami/kafka/logs \
+--name kafka-broker-03 \
+-e KAFKA_ZOOKEEPER_CONNECT=172.18.0.2:2181 \
+-e ALLOW_PLAINTEXT_LISTENER=yes \
+-d bitnami/kafka:2
+
+docker-zookeeper
+
+2181 2888 3888
+
+zookeeper_data:/bitnami'
+
+ALLOW_ANONYMOUS_LOGIN=yes
+
+bitnami/zookeeper:latest'
+
+sudo docker run \
+-p 2181:2181 \
+-p 2121:2121 \
+-p 2888:2888 \
+-p 3888:3888 \
+--net=processing-nw \
+-v /home/vagrant/workspaceml/kafka-zookeeper/bitnami-zookeeper-data:/bitnami \
+--name zookeeper-controller-01 \
+-e ALLOW_ANONYMOUS_LOGIN=yes \
+-d bitnami/zookeeper:latest
+
+Seed-Dist
+
+sudo docker run \
+-p 9095:9092 \
+--net=processing-nw \
+-v /home/vagrant/workspacescala/tracethreat/tracethreat-seeddistservices:/deploy \
+-v  /home/vagrant/workspacescala/tracethreat/tracethreat-seeddistservices/logs/:/var/log/sbt/ \
+--name seeddist-service-01 \
+-d seeddist-service:sbt-library-default
+
+
+
+
+
+    Run the Zookeeper CLI:
+    $ zookeeper/bin/zkCli.sh -server localhost:2181 #Make sure your Broker is already running
+
+    If it is successful, you can see the Zk client running as:
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:None path:null
+[zk: localhost:2181(CONNECTED) 0]
+
+    From here you can explore the broker details using various commands:
+
+$  ls /brokers/ids # Gives the list of active brokers
+$  ls /brokers/topics #Gives the list of topics
+$  get /brokers/ids/0 #Gives more detailed information of the broker id '0'
+
+
+zkCli.sh -server localhost:2181 <<< "ls /brokers/ids" | tail -n 1
+
+ls /consumers
+
+
+kafka-topics.sh --list --zookeeper 172.17.0.2:2121 --topic Message-Log
+
+kafka-topics.sh --list --zookeeper 172.17.0.2:2121  
+
+
+kafka-topics.sh --create --zookeeper 172.17.0.2:2181 --topic Message-Log
+
+kafka-topics.sh --create --zookeeper 172.18.0.2:2181 --topic Message-Log --replication-factor 3 --partitions 3
+
+bin/kafka-console-producer.sh --broker-list localhost:9092  --topic Message-Log
+
+kafka-console-producer.sh --broker-list kafka-broker-02:9093  --topic Message-Log
+
+# Create flume
+Config path :/opt/flume-config
+Host path: /home/vagrant/workspaceml/flume
+
+	sudo docker run \
+	-p 9982:9988 \
+	--net=processing-nw --ip 172.18.0.10  \
+	-v /home/vagrant/workspaceml/flume/config:/opt/flume-config  \
+	-v /opt/log/producer:/opt/log/producer  \
+	--name flume-message-log  \
+	-d  flume-dev:release-0.0.1
+
+
