@@ -11,7 +11,7 @@ import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
 import dev.infra.accumlogger.utils.DateUtils
 
-class AggregateLoggerService extends LazyLogging {
+class AggregateHDFSLoggerService extends LazyLogging {
 
   def getIPAddress(): String = {
     val localhost: InetAddress = InetAddress.getLocalHost

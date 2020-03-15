@@ -1,6 +1,6 @@
 import akka.actor.ActorSystem
 import scaldi.Module
-import dev.infra.accumlogger.AggregateLoggerService
+import dev.infra.accumlogger.AggregateHDFSLoggerService
 import com.typesafe.config.ConfigFactory
 import dev.infra.accumlogger.utils.ApplicationConf
 import com.typesafe.config.Config
@@ -15,7 +15,7 @@ class AkkaModule extends Module {
 
 class SeedMLModule extends Module {
   binding toProvider new ApplicationConf
-  binding toProvider new AggregateLoggerService
+  binding toProvider new AggregateHDFSLoggerService
 }
 
 object ApplicaitonMain extends App {
@@ -31,7 +31,7 @@ object ApplicaitonMain extends App {
   val groupId = appConf.datatumConfigConsumer(Option("app.consumer.stream.group"))
   val consumerId = appConf.datatumConfigConsumer(Option("app.consumer.stream.consumerid"))
   
-  implicit val aggregateLoggerService = inject[AggregateLoggerService]
+  implicit val aggregateLoggerService = inject[AggregateHDFSLoggerService]
   aggregateLoggerService.receiveFlumeLogging(appName.getOrElse(""),
     sparkNode.getOrElse("")) 
 }
