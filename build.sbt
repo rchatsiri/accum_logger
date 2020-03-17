@@ -9,15 +9,25 @@ organization := "dev.infra.accumlogger"
 retrieveManaged := true
 
 fork in run := true
-
-
+ 
 enablePlugins(PackPlugin)
 
 packMain := Map("ApplicationMain" -> "dev.infra.accumlogger.ApplicationMain")
- 
-
+  
 val projectMainClass = "ApplicationMain"
 mainClass in (Compile, packageBin) := Some(projectMainClass)
+  
+resolvers ++= Seq(
+  "Sonatype Snapshots Repository"  at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Sonatype Releases Repository"   at "https://oss.sonatype.org/content/repositories/releases", 
+  "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
+  "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/",
+  "Akka Releases Repository" at "https://repo.akka.io/releases/",
+  "Maven Central" at "https://repo1.maven.org/maven2/",
+  "Cloudera" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
+)
+
+libraryDependencies += "org.scala-lang" % "scala-library" % "2.11.8"
 
 libraryDependencies += "org.scala-lang" % "scala-library" % "2.11.2"
  
@@ -33,22 +43,25 @@ libraryDependencies += "junit" % "junit" % "4.8.1" % "test"
  
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.0.0" 
 
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.5"
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.5"
-dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.5"
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.5"
 
-resolvers ++= Seq(
-  "Sonatype Snapshots Repository"  at "https://oss.sonatype.org/content/repositories/snapshots",
-  "Sonatype Releases Repository"   at "https://oss.sonatype.org/content/repositories/releases", 
-  "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
-  "Akka Snapshot Repository" at "https://repo.akka.io/snapshots/",
-  "Akka Releases Repository" at "https://repo.akka.io/releases/",
-  "Maven Central" at "https://repo1.maven.org/maven2/",
-  "Cloudera" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
-)
-  
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.5"
 
-//Stream : https://doc.akka.io/docs/akka-stream-kafka/current/home.html 
+libraryDependencies += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.5"
+     
+libraryDependencies ++= Seq("org.mindrot" % "jbcrypt" % "0.3m")
+ 
+libraryDependencies ++= Seq("commons-io" % "commons-io" % "2.6")
+
+libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.3" % "provided"
+
+libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.3" % "provided"
+
+libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.3"
+
+libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.3"
+ 
+
 libraryDependencies ++= {  
   Seq(
     "com.typesafe.akka" %% "akka-actor" % "2.5.3",
@@ -74,8 +87,8 @@ libraryDependencies ++= {
     "org.apache.kafka" % "kafka-clients" % "2.2.1"
   )
 }
- 
-// Scala 2.10, 2.11, Query with MySQL 
+
+
 libraryDependencies ++= Seq( 
   "com.typesafe.slick" %% "slick" % "3.1.1",
   "com.typesafe.slick" %% "slick-testkit" % "3.1.1" % "test",
@@ -90,41 +103,6 @@ libraryDependencies ++= Seq(
 )
 
 
-//Dependency injection
-libraryDependencies ++= Seq("org.scaldi" %% "scaldi-akka" % "0.5.8")
-
-//encrypt
-libraryDependencies ++= Seq("org.mindrot" % "jbcrypt" % "0.3m")
-
-//Apache Common io
-libraryDependencies ++= Seq("commons-io" % "commons-io" % "2.6")
- 
- 
-
-//assemblyMergeStrategy in assembly := {
-//  case PathList("javax", "inject", xs @ _*) => MergeStrategy.last
-//  case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
-//  case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
-//  case PathList("org", "apache", xs @ _*) => MergeStrategy.last
-//  case PathList("com", "google", xs @ _*) => MergeStrategy.last
-// case PathList("com", "datastax", xs @ _*) => MergeStrategy.last
- // case PathList("org", "objectweb", xs @ _*) => MergeStrategy.last
-//  case PathList("org", "joda", xs @ _*) => MergeStrategy.last
-//  case PathList("org", "aopalliance", xs @ _*) => MergeStrategy.last
-//  case PathList("com", "github", xs @ _*) => MergeStrategy.last
-//  case PathList("com", "thoughtworks", xs @ _*) => MergeStrategy.last 
-//  case PathList("org", "slf4j", xs@_*) => MergeStrategy.last
-//  case PathList("org", "maven", xs @ _*) => MergeStrategy.last
-//  case PathList("org", "maven2", xs @ _*) => MergeStrategy.last
-//  case "git.properties" => MergeStrategy.first
-//  case "plugin.properties" => MergeStrategy.last
-//  case "application.conf"  => MergeStrategy.concat
-//  case "log4j.properties" => MergeStrategy.first
-//  case x =>
-//    val oldStrategy = (assemblyMergeStrategy in assembly).value
-//    oldStrategy(x)
-//}
-
 assemblyMergeStrategy in assembly := { 
    {
     case PathList("META-INF", xs @ _*) => MergeStrategy.discard 
@@ -132,8 +110,7 @@ assemblyMergeStrategy in assembly := {
     case x => MergeStrategy.first
    }
 }
-
-
+ 
 scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
