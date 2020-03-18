@@ -6,8 +6,8 @@ import dev.infra.accumlogger.AggregateConsumerLoggerService
 import dev.infra.accumlogger.AggregateHDFSLoggerService
 
 object ApplicaitonMain extends App {
-  
-  /* implicit val appModule = new SeedMLModule :: new AkkaModule */
+   
   val conf: Config = ConfigFactory.load()
+ 
    
 }
