@@ -25,9 +25,7 @@ resolvers ++= Seq(
   "Akka Releases Repository" at "https://repo.akka.io/releases/",
   "Maven Central" at "https://repo1.maven.org/maven2/",
   "Cloudera" at "https://repository.cloudera.com/artifactory/cloudera-repos/"
-)
-
-libraryDependencies += "org.scala-lang" % "scala-library" % "2.11.8"
+) 
 
 libraryDependencies += "org.scala-lang" % "scala-library" % "2.11.2"
  
@@ -60,6 +58,8 @@ libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.3" % "p
 libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.3"
 
 libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.3"
+
+libraryDependencies += "com.holdenkarau" %% "spark-testing-base" % "2.4.5_0.14.0" % "test"
  
 
 libraryDependencies ++= {  
@@ -99,9 +99,9 @@ libraryDependencies ++= Seq(
   "joda-time" % "joda-time" % "2.7",
   "org.joda" % "joda-convert" % "1.7", 
   "ch.qos.logback"  %  "logback-classic"   % "1.1.3"
-  
 )
 
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(cacheOutput = false)
 
 assemblyMergeStrategy in assembly := { 
    {

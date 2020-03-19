@@ -12,8 +12,9 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.SparkConf
 
 class AggregateConsumerLoggerService extends LazyLogging {
+  
   def receiveMessageStream() {
-    val sparkConf = new SparkConf().setMaster("spark://10.20.152.92:7077").setAppName("Access-Anomaly-Detect")
+    val sparkConf = new SparkConf().setMaster("spark://10.20.152.92:17077").setAppName("Access-Anomaly-Detect")
     val streamingContext = new StreamingContext(sparkConf, Seconds(1))
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> "10.20.152.92:9092,10.20.152.93:9092",
@@ -31,4 +32,5 @@ class AggregateConsumerLoggerService extends LazyLogging {
 
     stream.map(record => (record.key, record.value))
   }
+  
 }  
