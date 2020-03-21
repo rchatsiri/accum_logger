@@ -20,11 +20,11 @@ class AggregateConsumerLoggerService extends LazyLogging {
       "bootstrap.servers" -> "10.20.152.92:9092,10.20.152.93:9092",
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
-      "group.id" -> "use_a_separate_group_id_for_each_stream",
+      "group.id" -> "CBPAY-NGINX-MSG",
       "auto.offset.reset" -> "latest",
       "enable.auto.commit" -> (false: java.lang.Boolean))
 
-    val topics = Array("topicA", "topicB")
+    val topics = Array("CBPAY-NGINX-MSG-DEVACS-00")
     val stream = KafkaUtils.createDirectStream[String, String](
       streamingContext,
       PreferConsistent,
